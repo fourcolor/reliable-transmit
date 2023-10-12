@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     int enable = 1;
     int val = MPTCP_INFO_FLAG_SAVE_MASTER;
 
-    char *scheduler = "roundrobin";
+    char *scheduler = "default";
 
     struct mptcp_info minfo;
     struct mptcp_meta_info meta_info;
