@@ -1,0 +1,7 @@
+Default:
+  ShareNetworkFromPhone: True # This should be True if you want to test the MPTCP
+  
+MPTCP:
+  Interface: ["wlp0s20f3"]
+  SubFlowNum: 2
+  Backup: []
