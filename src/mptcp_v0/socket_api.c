@@ -148,9 +148,7 @@ void check_throttle(config_t *config, struct expr_time *nowP) {
   expr_time_diff(&config->start, nowP, &temp_time);
   seconds = expr_time_in_secs(&temp_time);
   bits_per_second = config->bytes_sent * 8 / seconds;
-  // printf("bits_per_second: %d\n", bits_per_second);
-  // printf("config->bitrate: %d\n", config->bitrate);
-  // fflush(stdout);
+
   if (bits_per_second < config->bitrate) {
     config->green_light = 1;
     FD_SET(config->sock, &config->write_set);
@@ -235,6 +233,7 @@ void subflow_info(TimerClientData client_data, struct expr_time *nowP) {
              minfo.subflows[i].tcpi_rcv_mss,
              minfo.subflows[i].tcpi_total_retrans);
       fflush(stdout);
+      memset(minfo.subflows,'\0',sizeof(subflows_info_len));
     }
   } else {
     perror("getsockopt");

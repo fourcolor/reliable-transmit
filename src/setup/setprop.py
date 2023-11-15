@@ -19,5 +19,7 @@ def set_prop():
 
     # setprop
     for device, info in zip(devices, devices_info):
-        print(info[1], device.shell("su -c 'getprop sys.usb.config'"))
-        print(info[1], device.shell("su -c 'setprop sys.usb.config rndis,adb'"))
+        print(device, info[1], device.shell("su -c 'getprop sys.usb.config'"))
+        print(device, info[1], device.shell("su -c 'setprop sys.usb.config rndis,adb'"))
+if __name__ == '__main__':
+    set_prop()

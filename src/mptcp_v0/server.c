@@ -17,18 +17,21 @@
 #define MAX_EVENTS 10
 #define DEFAULT_TCP_BLKSIZE (128 * 1024)
 #define SEC_TO_US 1000000LL
-int server_sock;
+int server_sock, nfds, epollfd;
+struct epoll_event ev, events[MAX_EVENTS];
 void signalHandler(int signum) {
   close(server_sock);
-  exit(-1);
+  for (int n = 0; n < nfds; ++n) {
+    close(events[n].data.fd);
+  }
+  exit(signum);
 }
 static int setnonblocking(int fd);
 int connection_handler();
 int main(int argc, char **argv) {
   int PORT;
-  int client_sock, nfds, epollfd, flag = 1;
+  int client_sock, flag = 1;
   struct sockaddr_in server_addr, client_addr;
-  struct epoll_event ev, events[MAX_EVENTS];
 
   int len, addr_len, recv_len, ret;
   struct timespec start, end;
@@ -175,6 +178,7 @@ int connection_handler(int sock) {
   } else if (read_size == -1) {
     perror("recv failed");
   }
-
+  close(sock);
+  epoll_ctl(epollfd, EPOLL_CTL_DEL, sock, &ev);
   return 0;
 }

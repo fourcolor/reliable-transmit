@@ -1,12 +1,14 @@
 Default:
   ShareNetworkFromPhone: True # This should be True if you want to test the MPTCP
-  Mode: "s"
-  SAddr: ""
-  CAddr: ""
+  Protocol: "MPTCPv0"
+  Mode: "s" # s: server c: client
+  SAddr: "140.112.20.183"
+  sPort: "26427"
   
-MPTCP:
-  Interface: ["wlp0s20f3"]
+MPTCPv0:
+  Interface: ["usb0", "usb1"]
   SubFlowNum: 2
   Backup: []
   Scheduler: "default"
-  PathManage: "fullmesh",
+  Bitrate: 1024 # 0 stands for no limit
+  PathManage: "fullmesh"
