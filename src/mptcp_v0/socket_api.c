@@ -13,6 +13,7 @@
 #include <sys/select.h>
 #include <sys/sendfile.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <unistd.h>
 // #include <netinet/in.h>
 // #include <arpa/inet.h>
@@ -222,18 +223,21 @@ void subflow_info(TimerClientData client_data, struct expr_time *nowP) {
     int subflows_info_len = minfo.total_sub_info_len;
     int subflows_number = subflows_info_len / sizeof(struct mptcp_sub_info);
     int i;
+    struct expr_time now;
+    expr_time_now(&now);
+
     for (i = 0; i < subflows_number; i++) {
       PARSE_ADDR_TO_IP(minfo.subflow_info[i].src_v4.sin_addr, c_ip);
       PARSE_ADDR_TO_IP(minfo.subflow_info[i].dst_v4.sin_addr, s_ip);
-      printf("%d,%s:%d,%s:%d,%d,%d,%d,%d,%d,%d\n", i, c_ip,
-             ntohs(minfo.subflow_info[i].src_v4.sin_port), s_ip,
+      printf("%lf,%d,%s:%d,%s:%d,%d,%d,%d,%d,%d,%d\n", expr_time_in_secs(&now),
+             i, c_ip, ntohs(minfo.subflow_info[i].src_v4.sin_port), s_ip,
              ntohs(minfo.subflow_info[i].dst_v4.sin_port),
              minfo.subflows[i].tcpi_rto, minfo.subflows[i].tcpi_ato,
              minfo.subflows[i].tcpi_rtt, minfo.subflows[i].tcpi_snd_mss,
              minfo.subflows[i].tcpi_rcv_mss,
              minfo.subflows[i].tcpi_total_retrans);
       fflush(stdout);
-      memset(minfo.subflows,'\0',sizeof(subflows_info_len));
+      // memset(minfo.subflows, '\0', sizeof(subflows_info_len));
     }
   } else {
     perror("getsockopt");
@@ -248,7 +252,8 @@ int timer_setting(config_t *config) {
     return -1;
   }
   config->reporter_timer = tmr_create(&now, subflow_info, cd, 1 * SEC_TO_US, 1);
-  printf("subflow_id,caddr,saddr,rto,ato,rtt,snd_mss,rcv_mss,total_retrans,\n");
+  printf("time,subflow_id,caddr,saddr,rto,ato,rtt,snd_mss,rcv_mss,total_"
+         "retrans,\n");
   fflush(stdout);
 }
 
