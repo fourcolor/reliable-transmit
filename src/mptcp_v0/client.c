@@ -69,7 +69,8 @@ int main(int argc, char **argv) {
   struct mptcp_info minfo;
   struct mptcp_meta_info meta_info;
   struct tcp_info initial;
-  struct tcp_info *others = malloc(subflow_num * sizeof(struct tcp_info));
+  // struct tcp_info *others = malloc(subflow_num * sizeof(struct tcp_info));
+  struct tcp_info others[2];
   struct mptcp_sub_info *others_info =
       malloc(subflow_num * sizeof(struct mptcp_sub_info));
 
@@ -92,7 +93,7 @@ int main(int argc, char **argv) {
   config.mp_enable = mptcp_enable;
   config.shost = addr;
   config.sport = port;
-  config.timeout = 3000;
+  config.timeout = 10000;
   config.mp_len = sizeof(minfo);
   client_sock_run(&config);
   return 0;

@@ -1,0 +1,70 @@
+# main.mi2app
+import os
+import sys
+import time
+import datetime as dt
+from mobile_insight.monitor import OnlineMonitor
+from mobile_insight.analyzer import MsgLogger
+from logging_analyzer import LoggingAnalyzer
+from myMsLogger import myMsgLogger
+# A helper utilities for mobileinsight
+from service import mi2app_utils as util
+
+
+# options of enabling logs
+
+nr_control = [
+        "5G_NR_RRC_OTA_Packet",
+        "5G_NR_ML1_Searcher_Measurement_Database_Update_Ext",
+        "5G_NR_ML1_Serving_Cell_Beam_Management",
+        "5G_NR_NAS_SM_Plain_OTA_Outgoing_Msg",
+        "5G_NR_NAS_SM_Plain_OTA_Incoming_Msg",
+        "5G_NR_RLC_DL_Stats",
+        "LTE_RRC_OTA_Packet",
+        "LTE_RRC_MIB_Packet",
+        "LTE_NAS_EMM_OTA_Outgoing_Packet",
+        "LTE_RRC_CDRX_Events_Info",
+        "LTE_NAS_EMM_OTA_Incoming_Packet",
+        'LTE_PHY_Connected_Mode_Intra_Freq_Meas',
+        'LTE_PHY_Connected_Mode_Neighbor_Measurement',
+        'LTE_PHY_Inter_RAT_Measurement',
+        'LTE_PHY_Inter_Freq_Log',
+        "LTE_RRC_Serv_Cell_Info",
+        "LTE_RLC_DL_AM_All_PDU",
+        "LTE_RLC_UL_AM_All_PDU",
+        "LTE_RLC_DL_Config_Log_Packet",
+        "LTE_RLC_UL_Config_Log_Packet",
+        "LTE_PDCP_DL_Cipher_Data_PDU",
+        "LTE_PDCP_UL_Cipher_Data_PDU",
+        "LTE_MAC_UL_Buffer_Status_Internal"
+        ]
+# Initialize a 5G monitor
+src = OnlineMonitor()
+
+now = dt.datetime.today()
+n = [str(x) for x in [now.year, now.month, now.day, now.hour, now.minute, now.second]]
+n = [x.zfill(2) for x in n]  # zero-padding to two digit
+n = '-'.join(n[:3]) + '_' + '-'.join(n[3:])
+
+# Enable logs based on settings
+if plugin_config["log_type"] == "ALL":
+    src.enable_log_all()
+else:
+    src.enable_log(nr_control)
+src.set_skip_decoding(False)
+# log_dir = os.path.join(util.get_mobileinsight_log_path(), "mi2log")
+src.save_log_as(util.get_mobileinsight_log_path()+"/" + n + ".mi2log")
+# src.set_log_cut_size(float(plugin_config['mi_log_size']) / 1000.0)
+# 
+
+loggingAnalyzer = LoggingAnalyzer(plugin_config)
+loggingAnalyzer.set_source(src)
+
+logger = myMsgLogger()
+logger.set_source(src)
+logger.set_decode_format(myMsgLogger.JSON)
+logger.set_dump_type(myMsgLogger.FILE_ONLY)
+logger.save_decoded_msg_as(f"{util.get_mobileinsight_log_path()}/decoded/"+n+".json")
+
+#Start the monitoring
+src.run()

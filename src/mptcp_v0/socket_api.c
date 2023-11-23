@@ -2,7 +2,7 @@
 #include "expr_time.h"
 #include "timer.h"
 #include <errno.h>
-
+// #include <linux/mptcp.h>
 #include <netinet/in.h>
 #include <poll.h>
 #include <stddef.h>
@@ -130,10 +130,9 @@ int create_sock_connect(config_t *config) {
     perror("[client] setsockopt(TCP_NODELAY) ");
     return -1;
   }
-  if (timeout_connect(sock, (struct sockaddr *)&addr, sizeof(addr),
-                      config->timeout) < 0) {
+  if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
     close(sock);
-    perror("[client] timeout_connect()");
+    perror("[client] connect()");
   }
 
   return sock;
@@ -237,7 +236,7 @@ void subflow_info(TimerClientData client_data, struct expr_time *nowP) {
              minfo.subflows[i].tcpi_rcv_mss,
              minfo.subflows[i].tcpi_total_retrans);
       fflush(stdout);
-      // memset(minfo.subflows, '\0', sizeof(subflows_info_len));
+      memset(minfo.subflows, '\0', sizeof(subflows_info_len));
     }
   } else {
     perror("getsockopt");

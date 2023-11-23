@@ -44,8 +44,8 @@ def main():
     expr_p = subprocess.Popen([exec_cmd], shell=True)
     process_list.append(expr_p)
     
-    for i in process_list:
-        i.wait()
+    while True:
+        time.sleep(1)
     
 if __name__ == '__main__':
     try:
